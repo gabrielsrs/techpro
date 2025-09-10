@@ -9,7 +9,10 @@ import { Badge } from './components/ui/badge';
 import { toast } from "sonner"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from './components/ui/carousel';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
-import icon from "./assets/icon.png"
+import icon from "./assets/icon-1024x1024.png"
+import googlePlayBadge from "./assets/GetItOnGooglePlay_Badge.png"
+import { Particle } from './components/particle';
+import { Gallery } from './components/gallery';
 
 export function App() {
   const [formData, setFormData] = useState({
@@ -21,26 +24,69 @@ export function App() {
     descricao: ''
   });
   const [navSelect, setNavSelect] = useState("");
+  const [showSection, setShowSection] = useState({})
 
-  const heroRef = useRef(null);
   const servicosRef = useRef(null);
   const comoTrabalhamosRef = useRef(null);
   const sobreRef = useRef(null);
   const projetosoRef = useRef(null);
   const orcamentoRef = useRef(null);
+
   
   useEffect(() => {
+    
     function calcScroll() {
-      if(window.scrollY < servicosRef.current.offsetTop) setNavSelect("")
-      else if(window.scrollY == document.body.offsetHeight - window.innerHeight) setNavSelect("orcamento")
-      else if(window.scrollY >= orcamentoRef.current.offsetTop) setNavSelect("orcamento")
-      else if(window.scrollY >= projetosoRef.current.offsetTop) setNavSelect("projetos")
-      else if(window.scrollY >= sobreRef.current.offsetTop) setNavSelect("sobre")
-      else if(window.scrollY >= comoTrabalhamosRef.current.offsetTop) setNavSelect("como-trabalhamos")
-      else if(window.scrollY >= servicosRef.current.offsetTop) setNavSelect("servicos")
+      const roundedScrollY = window.scrollY + 5
+      if(roundedScrollY < servicosRef.current.offsetTop) setNavSelect("")
+      else if(roundedScrollY >= document.body.offsetHeight - window.innerHeight) setNavSelect("orcamento")
+      else if(roundedScrollY >= orcamentoRef.current.offsetTop) setNavSelect("orcamento")
+      else if(roundedScrollY >= projetosoRef.current.offsetTop) setNavSelect("projetos")
+      else if(roundedScrollY >= sobreRef.current.offsetTop) setNavSelect("sobre")
+      else if(roundedScrollY >= comoTrabalhamosRef.current.offsetTop) setNavSelect("como-trabalhamos")
+      else if(roundedScrollY >= servicosRef.current.offsetTop) setNavSelect("servicos")
     }
 
     window.addEventListener("scroll", calcScroll)
+
+    const observers = []
+    const sections = [servicosRef, comoTrabalhamosRef, sobreRef, projetosoRef, orcamentoRef]
+
+    sections.forEach((section) => {
+      const elementOne = section.current.firstChild.firstChild
+      if (!elementOne) return;
+
+      const elementTwo = section.current.firstChild.lastChild
+      if (!elementTwo) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            const parentRef = entry.target.parentElement.parentElement.id
+            if(parentRef == "servicos") {
+              setShowSection(previous => ({...previous, servicos: "translate-y-0 opacity-100" }))
+            } else if(parentRef == "como-trabalhamos") {
+              setShowSection(previous => ({...previous, comoTrabalhamos: "translate-y-0 opacity-100" }))
+            } else if(parentRef == "sobre") {
+              setShowSection(previous => ({...previous, sobre: "translate-x-0 opacity-100" }))
+            } else if(parentRef == "projetos") {
+              setShowSection(previous => ({...previous, projetos: "translate-y-0 opacity-100" }))
+            } else if(parentRef == "orcamento") {
+              setShowSection(previous => ({...previous, orcamento: "translate-y-0 translate-x-0 opacity-100" }))
+            }
+            observer.unobserve(entry.target)
+          }
+        }
+      )
+
+      observer.observe(elementOne);
+      observers.push(observer);
+
+      observer.observe(elementTwo);
+      observers.push(observer);
+    })
+
+    return () => observers.forEach((o) => o.disconnect())
+
   }, [])
 
   const scrollTo = (target, servicoTipo="") => {
@@ -114,7 +160,7 @@ export function App() {
       icon: Radio,
       title: "Interfonia e Portaria",
       description: "Sistemas de interfone residencial e condominial, portaria eletrônica, videoporteiros e controle de acesso predial.",
-      image: "https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-596c-622f-9483-a26880a6feab/raw?se=2025-07-30T00%3A28%3A47Z&sp=r&sv=2024-08-04&sr=b&scid=3cfd5d77-f507-5a7b-a873-9073d7ec53d8&skoid=ea0c7534-f237-4ccd-b7ea-766c4ed977ad&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-29T18%3A51%3A49Z&ske=2025-07-30T18%3A51%3A49Z&sks=b&skv=2024-08-04&sig=BvfN%2Bp4YkXRvFpIyOmKWhok6uj8QNx0a6rv5dLwuDuw%3D",
+      image: "https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-596c-622f-9483-a26880a6feab/raw?se=2025-07-30T02%3A11%3A58Z&sp=r&sv=2024-08-04&sr=b&scid=168e368e-6325-5e72-b161-f4d7ae92c157&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-07-29T18%3A51%3A58Z&ske=2025-07-30T18%3A51%3A58Z&sks=b&skv=2024-08-04&sig=wjrl0c8aZlclanMFeo/GFhUgeGGajHauLDUDHrCbDJc%3D",
       serviceType: "interfonia"
     },
     {
@@ -154,50 +200,27 @@ export function App() {
     }
   ];
 
-  const projects = [
-    {
-      title: "Condomínio Residencial",
-      description: "Sistema completo: elétrica, câmeras, interfonia e redes",
-      image: "https://images.unsplash.com/photo-1582037928769-181f2644ecb7?w=400&h=300&fit=crop"
-    },
-    {
-      title: "Escritório Corporativo",
-      description: "Infraestrutura tecnológica completa + segurança",
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop"
-    },
-    {
-      title: "Shopping Center",
-      description: "Redes estruturadas e sistema de monitoramento",
-      image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=300&fit=crop"
-    },
-    {
-      title: "Residência de Alto Padrão",
-      description: "Automação residencial e sistema de entretenimento",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop"
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full flex justify-center border-b bg-background/95  backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4">
+      <header className="sticky top-0 z-30 w-full flex justify-center border-b bg-background/95  backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex gap-2 h-16 items-center justify-between px-4">
           <div className="flex items-center space-x-3">
-            <div onClick={() => scrollTo("")}>
-              <img src={icon} alt="TechPro Logo" className="h-10 w-10 cursor-pointer"/>
+            <div onClick={() => scrollTo("")} className="flex">
+              <img src={icon} alt="TechPro Logo" className="h-10 w-10 cursor-pointer shrink-0"/>
             </div>
             <h1 className="text-xl font-bold text-primary">TechPro Soluções</h1>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
-            <span className={`${navSelect == "servicos" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors cursor-pointer`} onClick={() => scrollTo("servicos")}>Serviços</span>
-            <span className={`${navSelect == "como-trabalhamos" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors cursor-pointer`} onClick={() => scrollTo("como-trabalhamos")}>Como Trabalhamos</span>
-            <span className={`${navSelect == "sobre" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors cursor-pointer`} onClick={() => scrollTo("sobre")}>Sobre Nós</span>
-            <span className={`${navSelect == "projetos" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors cursor-pointer`} onClick={() => scrollTo("projetos")}>Projetos</span>
-            <span className={`${navSelect == "orcamento" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors cursor-pointer`} onClick={() => scrollTo("orcamento")}>Orçamento</span>
+            <span className={`${navSelect == "servicos" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors text-center cursor-pointer`} onClick={() => scrollTo("servicos")}>Serviços</span>
+            <span className={`${navSelect == "como-trabalhamos" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors text-center cursor-pointer`} onClick={() => scrollTo("como-trabalhamos")}>Como Trabalhamos</span>
+            <span className={`${navSelect == "sobre" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors text-center cursor-pointer`} onClick={() => scrollTo("sobre")}>Sobre Nós</span>
+            <span className={`${navSelect == "projetos" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors text-center cursor-pointer`} onClick={() => scrollTo("projetos")}>Projetos</span>
+            <span className={`${navSelect == "orcamento" && "border-b-[1px] border-b-[#1E3A5F]"} hover:text-primary transition-colors text-center cursor-pointer`} onClick={() => scrollTo("orcamento")}>Orçamento</span>
           </nav>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-1 text-sm hover:text-primary">
-              <Phone className="h-4 w-4" />
+              <Phone className="h-4 w-4 shrink-0" />
               <span className="hidden sm:inline">(32) 98811-7587</span>
             </div>
             <Button style={{ backgroundColor: '#25D366' }} className="text-white hover:opacity-90" onClick={() => window.open("https://wa.me/32988117587", "_blank")}>
@@ -208,12 +231,15 @@ export function App() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      {/* <section ref={heroRef} className="relative flex justify-center text-primary-foreground py-52 bg-[url(https://t4.ftcdn.net/jpg/08/84/48/39/240_F_884483949_6Gw6kgsy4WtF8eOthRyMvMy7y5BhmPmb.jpg)] bg-no-repeat bg-cover mask-radial-from-regal-blue"> */}
-      <section ref={heroRef} className="relative flex justify-center bg-linear-145 from-[#1E3A5F] from-58% to-[#F4B942] to-72% text-primary-foreground py-52">
-      {/* <section className="relative flex justify-center bg-gradient-to-br from-primary via-primary to-[#2a4a6b] text-primary-foreground py-40"> */}
-        {/* <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70"></div> */}
-        <div className="container px-4 relative z-10">
+      {/* Hero Section */}      
+      <section className="relative flex justify-center bg-[#1E3A5F] text-primary-foreground py-52">
+          {/* <div ref={heroRef} className="absolute top-0 left-0 w-full h-full bg-linear-145 from-[#1E3A5F] from-58% to-[#f4b94200] to-72% text-primary-foreground py-52 z-1"></div> */}
+
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/10 z-2"></div>
+        <div className="absolute top-0 left-0 w-full h-full mask-alpha mask-r-from-black mask-r-from-50% mask-r-to-transparent bg-[url(https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?_gl=1*1fos1ip*_ga*NTI5MDU2MzQuMTc1MzE0MzA2Nw..*_ga_8JE65Q40S6*czE3NTMxNDMwNjYkbzEkZzEkdDE3NTMxNDMzNTYkajU5JGwwJGgw)] bg-no-repeat bg-cover bg-top text-primary-foreground py-52 z-1"></div>
+        <Particle id="particle-header"/>
+        
+        <div className="container px-4 relative z-10"> {/* z-10 */}
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl mb-6">
               Soluções Tecnológicas Completas
@@ -239,7 +265,7 @@ export function App() {
       {/* Nossos Serviços - Carrossel */}
       <section id="servicos" ref={servicosRef} className="flex justify-center py-40 bg-muted/30">
         <div className="container px-4">
-          <div className="text-center mb-16">
+          <div className={`text-center mb-16 duration-1000 ${showSection?.servicos || "translate-y-full opacity-0"}`}>
             <h2 className="text-3xl md:text-4xl mb-4 text-primary">Nossos Serviços</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Oferecemos soluções tecnológicas completas para residências e empresas, 
@@ -247,7 +273,7 @@ export function App() {
             </p>
           </div>
           
-          <div className="relative">
+          <div className={`relative duration-1500 ${showSection?.servicos || "translate-y-full opacity-0"}`}>
             <Carousel className="w-full" opts={{ align: "start", loop: true }}>
               <CarouselContent className="-ml-2 md:-ml-4">
                 {services.map((service, index) => (
@@ -297,15 +323,15 @@ export function App() {
       {/* Como Trabalhamos */}
       <section id="como-trabalhamos" ref={comoTrabalhamosRef} className="flex justify-center py-40">
         <div className="container px-4">
-          <div className="text-center mb-16">
+          <div className={`text-center mb-16 duration-1000 ${showSection?.comoTrabalhamos || "translate-y-full opacity-0"}`}>
             <h2 className="text-3xl md:text-4xl mb-4 text-primary">Como Trabalhamos</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Processo simples e transparente, do primeiro contato até a conclusão do seu projeto tecnológico.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 duration-1500 ${showSection?.comoTrabalhamos || "translate-y-full opacity-0"}`}>
             {workProcess.map((process, index) => (
-              <Card key={index} className="text-center border-primary/10">
+              <Card key={index} className="text-center border-primary/10 hover:shadow-lg hover:border-accent/50">
                 <CardHeader>
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <process.icon className="h-8 w-8" />
@@ -328,9 +354,8 @@ export function App() {
 
       {/* Sobre Nós */}
       <section id="sobre" ref={sobreRef} className="flex justify-center py-40 bg-muted/30">
-        <div className="container px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
+        <div className="container px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className={`duration-1000 ${showSection?.sobre || "-translate-x-full opacity-0"}`}>
               <h2 className="text-3xl md:text-4xl mb-6 text-primary">Por que escolher a TechPro?</h2>
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
@@ -358,55 +383,38 @@ export function App() {
                   <Wrench className="h-6 w-6 text-accent mt-1 flex-shrink-0" style={{ color: '#f4b942' }} />
                   <div>
                     <h3 className="mb-2 text-primary">Garantia Estendida</h3>
-                    <p className="text-muted-foreground">3 meses de garantia em todos os serviços.</p>
+                    <p className="text-muted-foreground">Oferecemos 3 meses de garantia para assegurar a qualidade dos nossos serviços.</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="relative">
+            <div className={`relative duration-1000 ${showSection?.sobre || "translate-x-full opacity-0"}`}>
               <ImageWithFallback
                 src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&h=400&fit=crop"
                 alt="Técnico especializado trabalhando"
                 className="rounded-lg shadow-lg w-full h-80 object-cover border-2 border-accent/20"
               />
             </div>
-          </div>
         </div>
       </section>
 
       {/* Projetos Realizados */}
       <section id="projetos" ref={projetosoRef} className="flex justify-center py-40">
         <div className="container px-4">
-          <div className="text-center mb-16">
+          <div className={`text-center mb-16 duration-1000 ${showSection?.projetos || "translate-y-full opacity-0"}`}>
             <h2 className="text-3xl md:text-4xl mb-4 text-primary">Projetos Realizados</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Confira alguns dos nossos trabalhos mais recentes e veja a qualidade e diversidade de soluções que entregamos.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {projects.map((project, index) => (
-              <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow border-primary/10">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <ImageWithFallback
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="mb-2 text-primary">{project.title}</h3>
-                  <p className="text-sm text-muted-foreground">{project.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <Gallery showSection={showSection} navSelect={navSelect}/>
         </div>
       </section>
 
       {/* Solicite seu Orçamento */}
       <section id="orcamento" ref={orcamentoRef} className="flex justify-center py-40 bg-muted/30">
         <div className="container px-4">
-          <div className="text-center mb-16">
+          <div className={`text-center mb-16 duration-1000 ${showSection?.orcamento || "translate-y-full opacity-0"}`}>
             <h2 className="text-3xl md:text-4xl mb-4 text-primary">Solicite seu Orçamento</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Preencha o formulário abaixo ou entre em contato diretamente conosco. 
@@ -415,7 +423,7 @@ export function App() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Formulário */}
-            <div className="lg:col-span-2">
+            <div className={`lg:col-span-2 duration-1000 ${showSection?.orcamento || "-translate-x-full opacity-0"}`}>
               <Card className="border-primary/10">
                 <CardHeader>
                   <CardTitle className="text-primary">Formulário de Orçamento</CardTitle>
@@ -515,7 +523,7 @@ export function App() {
             </div>
 
             {/* Informações de Contato */}
-            <div className="space-y-6">
+            <div className={`space-y-6 duration-2000 ${showSection?.orcamento || "translate-x-full opacity-0"}`}>
               <Card className="border-primary/10">
                 <CardHeader>
                   <CardTitle className="text-primary">Contato Direto</CardTitle>
@@ -551,14 +559,28 @@ export function App() {
                   </div>
                 </CardContent>
               </Card>
+              <Card className="border-primary/10">
+              <CardContent className="p-6">
+                  <h3 className="mb-4 text-primary">Instalar Aplicativo</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Solicite orçamentos sempre que precisar direto do seu celular.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button className="" variant="none" size="none" onClick={() => console.log("app store")}>
+                      <img className="h-12" src={googlePlayBadge} alt="" />
+                    </Button>
+                  </div>
+              </CardContent>
+              </Card>
             </div>
           </div>
         </div>
       </section>
 
       {/* Rodapé */}
-      <footer className="flex justify-center bg-primary text-primary-foreground py-12">
-        <div className="container flex flex-col gap-20 px-4">
+      <footer className="relative flex justify-center bg-[#1E3A5F] text-primary-foreground py-12">
+        <Particle id="particle-footer"/>
+        <div className="container flex flex-col gap-20 px-4 z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-3 mb-4">
@@ -570,9 +592,9 @@ export function App() {
                 Qualidade, segurança e inovação em cada projeto.
               </p>
               <div className="flex space-x-4">
-                <Instagram className="cursor-pointer hover:text-[#f4b942]"/>
-                <Linkedin className="cursor-pointer hover:text-[#f4b942]"/>
-                <Facebook className="cursor-pointer hover:text-[#f4b942]"/>
+                <Instagram className="cursor-pointer transition delay-10 duration-200 ease-in-out hover:text-[#f4b942]"/>
+                <Linkedin className="cursor-pointer transition delay-10 duration-200 ease-in-out hover:text-[#f4b942]"/>
+                <Facebook className="cursor-pointer transition delay-10 duration-200 ease-in-out hover:text-[#f4b942]"/>
               </div>
             </div>
             
@@ -596,7 +618,7 @@ export function App() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4" />
-                  <span>contato@techpro.com</span>
+                  <span>contato@techpro.com.br</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <MapPin className="h-4 w-4" />

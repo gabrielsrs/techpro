@@ -1,0 +1,17 @@
+{
+  "name": "TechPro Soluções",
+  "icons": [
+    {
+      "src": "../assets/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "../assets/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone"
+}

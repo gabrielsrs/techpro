@@ -1,0 +1,20 @@
+[
+  {
+    "step": "1",
+    "icon": "messageCircle",
+    "title": "Primeiro Contato",
+    "description": "Entre em contato conosco via WhatsApp, telefone ou formulário. Fazemos uma primeira avaliação das suas necessidades."
+  },
+  {
+    "step": "2",
+    "icon": "camera",
+    "title": "Avaliação e Orçamento",
+    "description": "Agendamos uma visita técnica gratuita para avaliar o local e elaborar um orçamento detalhado sem compromisso."
+  },
+  {
+    "step": "3",
+    "icon": "checkCircle",
+    "title": "Execução do Serviço",
+    "description": "Com a aprovação, executamos o serviço com qualidade, pontualidade e garantia. Emitimos certificado de conclusão."
+  }
+]
